@@ -1,0 +1,6 @@
+{
+  "name": "Crown Ether Visualizer",
+  "description": "An interactive host-guest chemistry simulator visualising crown ether rings (12-crown-4, 15-crown-5, 18-crown-6, 21-crown-7) and their metal cation size-matching behavior (Li+, Na+, K+, Rb+, Cs+) with physical/geometric calculations, custom SVG animations, and thermodynamic binding curves.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
