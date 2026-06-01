@@ -6,7 +6,6 @@
 import React from "react";
 import { CrownEther } from "../types";
 import { CROWN_ETHERS } from "../chemicalData";
-import { CircleIcon } from "lucide-react";
 
 interface CrownSelectorProps {
   selectedCrown: CrownEther;

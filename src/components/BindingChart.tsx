@@ -48,7 +48,7 @@ export const BindingChart: React.FC<BindingChartProps> = ({
         <div>
           <h3 className="text-sm font-medium text-slate-200 tracking-tight">Thermodynamic Affinity Curve</h3>
           <p className="text-[11px] font-mono text-slate-400 mt-0.5">
-            Log Stability Constants ($\log K_s$) in MeOH at 25&deg;C
+            Representative log K_s values in methanol at 25&deg;C
           </p>
         </div>
         <div className="flex items-center gap-2">

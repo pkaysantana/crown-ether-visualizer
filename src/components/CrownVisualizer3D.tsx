@@ -255,9 +255,6 @@ export const CrownVisualizer3D: React.FC<CrownVisualizer3DProps> = ({
       const angle = o.angle;
       // Inward vector in absolute coordinates is towards (0,0,-pucker)
       // Represent a lobe pointing inward
-      const lobeReach = 0.55; // 0.55 Ångströms lobe length
-      const ox_in = o.x - (lobeReach * scale * Math.cos(angle) * Math.cos((tiltAngle * Math.PI)/180));
-      // Let's compute actual 3D tip of lobe
       const oTipX = baseAtoms[o.origIdx].x * 0.65;
       const oTipY = baseAtoms[o.origIdx].y * 0.65;
       const oTipZ = baseAtoms[o.origIdx].z; // slightly off center
@@ -596,7 +593,6 @@ export const CrownVisualizer3D: React.FC<CrownVisualizer3DProps> = ({
               let fill = "url(#carbon-glow)";
               let stroke = "#334155";
               let strokeW = 1;
-              let label = "";
 
               if (atomType === "O") {
                 r = 13;

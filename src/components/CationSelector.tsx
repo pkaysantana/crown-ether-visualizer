@@ -6,7 +6,6 @@
 import React from "react";
 import { Cation } from "../types";
 import { CATIONS } from "../chemicalData";
-import { Sparkles, Activity } from "lucide-react";
 
 interface CationSelectorProps {
   selectedCation: Cation;
@@ -106,13 +105,13 @@ export const CationSelector: React.FC<CationSelectorProps> = ({
             </div>
           </div>
           <div className="bg-slate-900/60 p-1.5 border border-slate-800/40 rounded-lg text-center">
-            <div className="text-[8px] font-mono text-slate-500 uppercase leading-none" title="hydration hydration enthalpy">Hydration Enthalpy</div>
+            <div className="text-[8px] font-mono text-slate-500 uppercase leading-none" title="hydration enthalpy">Hydration Enthalpy</div>
             <div className="text-xs font-bold font-mono text-emerald-400 mt-0.5">
               {selectedCation.hydrationEnergy} <span className="text-[8px]">kJ/mol</span>
             </div>
           </div>
           <div className="bg-slate-900/60 p-1.5 border border-slate-800/40 rounded-lg text-center">
-            <div className="text-[8px] font-mono text-slate-500 uppercase leading-none">Valence Config</div>
+            <div className="text-[8px] font-mono text-slate-500 uppercase leading-none">Ion Config</div>
             <div className="text-xs font-bold font-mono text-purple-400 mt-0.5">
               {selectedCation.electronConfig}
             </div>

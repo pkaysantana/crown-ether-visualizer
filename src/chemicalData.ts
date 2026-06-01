@@ -27,7 +27,7 @@ export const CATIONS: Cation[] = [
     charge: 1,
     color: "#f59e0b", // Amber/Gold
     atomicNumber: 11,
-    electronConfig: "[Ne] 3s⁰",
+    electronConfig: "[Ne]",
     description: "The second smallest alkali metal ion. It matches the cavity size of 15-crown-5 perfectly. It has moderate charge density and moderate hydration energy."
   },
   {
@@ -39,7 +39,7 @@ export const CATIONS: Cation[] = [
     charge: 1,
     color: "#8b5cf6", // Purple/Violet
     atomicNumber: 19,
-    electronConfig: "[Ar] 4s⁰",
+    electronConfig: "[Ar]",
     description: "A biologically important cation and the classic match for 18-crown-6. Its hydration energy (−321 kJ/mol) is weaker than lithium or sodium, so the energy gained from coordination to six oxygen donors can more easily overcome the desolvation penalty."
   },
   {
@@ -51,7 +51,7 @@ export const CATIONS: Cation[] = [
     charge: 1,
     color: "#ec4899", // Ruby Pink
     atomicNumber: 37,
-    electronConfig: "[Kr] 5s⁰",
+    electronConfig: "[Kr]",
     description: "A larger cation. Its radius (1.52 Å) matches the 21-crown-7 ether. It is slightly too large for 18-crown-6, forcing it to sit slightly out of the oxygen plane."
   },
   {
@@ -63,7 +63,7 @@ export const CATIONS: Cation[] = [
     charge: 1,
     color: "#3b82f6", // Indigo/Blue
     atomicNumber: 55,
-    electronConfig: "[Xe] 6s⁰",
+    electronConfig: "[Xe]",
     description: "The largest stable alkali metal cation. It is far too large for 12-crown-4 or 15-crown-5. In 18-crown-6, it sits approximately 1.4 Å above the plane of the oxygen atoms, or binds two crown ether rings together in a 1:2 'sandwich' structure."
   }
 ];
@@ -119,8 +119,7 @@ export const CROWN_ETHERS: CrownEther[] = [
   }
 ];
 
-// Experimental log Ks (binding association constants) in anhydrous Methanol at 25°C
-// These depict the real physical size-matching trend!
+// Representative log Ks values showing the physical size-matching trend.
 export const BINDING_CONSTANTS: Record<string, Record<string, number>> = {
   "12c4": {
     "li": 2.10, // Peak
@@ -173,6 +172,16 @@ export function getSizeFitStatus(crownId: string, cationId: string): {
   const crown = CROWN_ETHERS.find(c => c.id === crownId);
   const cation = CATIONS.find(c => c.id === cationId);
   if (!crown || !cation) return { status: "too-small", label: "No data" };
+
+  const textbookMatches: Record<string, string[]> = {
+    "12c4": ["li"],
+    "15c5": ["na"],
+    "18c6": ["k"],
+    "21c7": ["rb", "cs"]
+  };
+  if (textbookMatches[crownId]?.includes(cationId)) {
+    return { status: "match", label: "Good size match" };
+  }
 
   const tolerance = 0.06;
   if (cation.radius < crown.cavityRadiusMin - tolerance) {
@@ -366,7 +375,6 @@ export function calculateLiveMetrics(
   const averageDistance = totalD / oxygens.length;
 
   const radialDist = Math.sqrt(catX * catX + catY * catY);
-  const targetMO = cation.radius + 1.24; // ideal donor bond length
   const fit = getSizeFitStatus(crownId, cationId);
 
   // Let's analyze the alignment:
@@ -436,7 +444,7 @@ export function calculateLiveMetrics(
   // Force bounds
   stabilityScore = Math.max(0, Math.min(100, stabilityScore));
 
-  // Compute a live potential score (simplified sum of dipole attraction vs. LJ steric cores)
+  // Compute a live potential score (simplified sum of dipole attraction vs. steric repulsion)
   // Coulomb sum: V = sum( -q_O * q_cat / r )
   // Steric core: sum( (sigma/r)^12 )
   let potentialSum = 0;
@@ -451,7 +459,7 @@ export function calculateLiveMetrics(
     
     // Electrostatic attraction
     const V_electrostatic = (q_O * q_cat) / Math.max(0.1, r);
-    // Repulsion (Lennard-Jones style potential)
+    // Short-range steric repulsion term
     const sigma = (cation.radius + 1.2) * 0.85; // repulsion radius boundary
     const V_repulsion = 0.08 * Math.pow(sigma / Math.max(0.1, r), 12);
     

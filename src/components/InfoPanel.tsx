@@ -49,13 +49,12 @@ export const InfoPanel: React.FC<InfoPanelProps> = ({
             {fit.status === "match" ? (
               <p>
                 <strong className="text-teal-400 font-bold">Good size match.</strong>{" "}
-                <span className="text-slate-100 font-semibold">{selectedCation.symbol}</span> is in, or very close to, the cavity range of{" "}
-                <span className="text-slate-100 font-semibold">{selectedCrown.name}</span>{" "}
-                (
+                <span className="text-slate-100 font-semibold">{selectedCation.symbol}</span> is a preferred guest for{" "}
+                <span className="text-slate-100 font-semibold">{selectedCrown.name}</span>. Its listed cavity radius is{" "}
                 <span className="text-slate-100 font-semibold font-mono">
                   {selectedCrown.cavityRadiusMin.toFixed(2)}-{selectedCrown.cavityRadiusMax.toFixed(2)} Å
                 </span>
-                ). The ion can sit near the centre so several oxygen lone pairs point at it at similar M-O distances. That gives a stronger
+                . The ion can sit near the centre so several oxygen lone pairs point at it at similar M-O distances. That gives a stronger
                 ion-dipole attraction and a higher stability constant{" "}
                 <span className="text-slate-100 font-semibold font-mono">(log K ≈ {logK.toFixed(2)})</span>.
               </p>
