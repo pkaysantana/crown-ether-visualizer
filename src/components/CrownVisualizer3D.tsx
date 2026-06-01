@@ -4,8 +4,8 @@
  */
 
 import React, { useRef, useState, useEffect } from "react";
-import { Play, RotateCcw, AlertCircle, Eye, EyeOff, Zap, RefreshCw } from "lucide-react";
-import { Cation, CrownEther, Atom2D } from "../types";
+import { Play, RotateCcw, Zap, RefreshCw } from "lucide-react";
+import { Cation, CrownEther } from "../types";
 import {
   generateCrownAtoms,
   getCrownGeometricalRadius,
@@ -159,28 +159,17 @@ export const CrownVisualizer3D: React.FC<CrownVisualizer3DProps> = ({
     });
   }
 
-  // Coordination Covalent Coordinate lines (Metal - Oxygen bonds)
-  // These connect projectedCation to each projected Oxygen
+  // Metal-oxygen contact lines show the ion-dipole attraction to each oxygen donor.
   const coordinationLines = projectedAtoms
     .filter(a => a.type === "O")
     .map(o => {
-      // Calculate real chemical 3D distance
-      const dx = o.x - catX;
-      const dy = o.y - catY;
-      const dz = o.z - catZ;
-      const physicalDistance = Math.sqrt(
-        (o.x - catX) * (o.x - catX) + 
-        (o.y - catY) * (o.y - catY) + 
-        (o.z - catZ) * (o.z - catZ)
-      ); // Cartesian distance in Angstroms
-      
       const real3dDist = Math.sqrt(
         Math.pow(baseAtoms[o.origIdx].x - catX, 2) +
         Math.pow(baseAtoms[o.origIdx].y - catY, 2) +
         Math.pow(baseAtoms[o.origIdx].z - catZ, 2)
       );
 
-      // Ideal bond length = R_cation + R_oxygen (1.24 Å donor offset)
+      // Approximate ideal M-O contact length = R_cation + donor-oxygen contact radius.
       const idealDistance = selectedCation.radius + 1.24;
       const deviation = Math.abs(real3dDist - idealDistance);
 
@@ -344,7 +333,7 @@ export const CrownVisualizer3D: React.FC<CrownVisualizer3DProps> = ({
         {/* Status Indicators */}
         <div className="flex gap-2 items-center">
           <div className="flex flex-col items-end">
-            <span className="text-[10px] font-mono text-slate-400 uppercase">Equilibrium Distance</span>
+            <span className="text-[10px] font-mono text-slate-400 uppercase">Ideal M-O Distance</span>
             <span className="text-sm font-semibold font-mono text-slate-100">
               {(selectedCation.radius + 1.24).toFixed(2)} Å
             </span>
@@ -361,7 +350,7 @@ export const CrownVisualizer3D: React.FC<CrownVisualizer3DProps> = ({
         {showMeasurements && (
           <div className="absolute top-3 left-3 bg-slate-900/90 backdrop-blur border border-slate-800 rounded-lg p-2.5 text-xs text-slate-300 font-mono z-20 shadow-lg flex flex-col gap-1 select-none">
             <span className="text-cyan-400 font-semibold mb-0.5">Physical Parameters:</span>
-            <span>Cation Radius (Li⁺/Na⁺/K⁺): <span className="text-slate-100 font-bold">{selectedCation.radius.toFixed(2)} Å</span></span>
+            <span>{selectedCation.symbol} Radius: <span className="text-slate-100 font-bold">{selectedCation.radius.toFixed(2)} Å</span></span>
             <span>Est. Cavity Radius: <span className="text-slate-100 font-bold">{selectedCrown.cavityRadiusMin.toFixed(2)} - {selectedCrown.cavityRadiusMax.toFixed(2)} Å</span></span>
             <span>Mean M-O Bond: <span className="text-yellow-400 font-bold">{liveMetrics.averageDistance.toFixed(2)} Å</span></span>
             <span>Z-Elevation: <span className="text-indigo-400 font-bold">{Math.abs(catZ).toFixed(2)} Å</span></span>
@@ -383,14 +372,14 @@ export const CrownVisualizer3D: React.FC<CrownVisualizer3DProps> = ({
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-400">Inward Lone-Pair Overlaps:</span>
+              <span className="text-slate-400">O donors contacting ion:</span>
               <span className="text-slate-200 font-bold ml-4">
-                {selectedCrown.oxygens} × Coordinate Bonds
+                {selectedCrown.oxygens} × M-O contacts
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-400">Attractive Coupling Force:</span>
-              <span className="text-cyan-300 font-bold">{liveMetrics.electrostaticForce} V/Å</span>
+              <span className="text-slate-400">Relative attraction score:</span>
+              <span className="text-cyan-300 font-bold">{liveMetrics.electrostaticForce}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-slate-400">Total Structural Stability:</span>
@@ -405,10 +394,10 @@ export const CrownVisualizer3D: React.FC<CrownVisualizer3DProps> = ({
         {/* Absolute center pointer instructions */}
         <div className="absolute top-3 right-3 flex flex-col items-end gap-1.5 bg-slate-900/50 backdrop-blur px-2.5 py-1.5 border border-slate-800/40 rounded-lg select-none">
           <span className="text-[9px] font-mono text-slate-400 flex items-center gap-1">
-            <Zap className="w-3 h-3 text-cyan-400 animate-pulse" /> GRAB & DRAG ATOM ON THE RING
+            <Zap className="w-3 h-3 text-cyan-400 animate-pulse" /> DRAG THE CATION ACROSS THE RING
           </span>
           <span className="text-[9px] font-mono text-slate-400">
-            Slide vertical controls to change 3D angle
+            Use Z-elevation to move it above or below the oxygen plane
           </span>
         </div>
 
@@ -453,7 +442,7 @@ export const CrownVisualizer3D: React.FC<CrownVisualizer3DProps> = ({
             </filter>
           </defs>
 
-          {/* Coordinate Electrostatic Mesh (drawn in background) */}
+          {/* Oxygen donor circle, drawn in the background as a size reference. */}
           <circle 
             cx={centerX} 
             cy={centerY} 
@@ -467,7 +456,7 @@ export const CrownVisualizer3D: React.FC<CrownVisualizer3DProps> = ({
             id="cavity-boundary-circle"
           />
 
-          {/* 1. Behind Coordination Lines (Metal-Oxygen attraction) */}
+          {/* 1. Behind metal-oxygen attraction lines */}
           {coordinationLines.map((line, idx) => {
             const ox = line.oxProj.x;
             const oy = line.oxProj.y;
@@ -492,7 +481,7 @@ export const CrownVisualizer3D: React.FC<CrownVisualizer3DProps> = ({
                   opacity={line.coupling > 0.6 ? 0.7 : 0.3}
                   className={line.coupling > 0.6 ? "animate-pulse" : ""}
                 />
-                {/* Visual coordinate distance text */}
+                  {/* Visual M-O distance text */}
                 {showMeasurements && (line.coupling > 0.3 || idx === 0) && (
                   <g transform={`translate(${(ox + cx) / 2}, ${(oy + cy) / 2 - 8})`}>
                     <rect 
@@ -721,7 +710,7 @@ export const CrownVisualizer3D: React.FC<CrownVisualizer3DProps> = ({
             return null;
           })}
 
-          {/* 3. Foreground Coordination lines (if Cation is in front, coordinate lines connect frontwards) */}
+          {/* 3. Foreground metal-oxygen attraction lines */}
           {coordinationLines.map((line, idx) => {
             const ox = line.oxProj.x;
             const oy = line.oxProj.y;
@@ -746,7 +735,7 @@ export const CrownVisualizer3D: React.FC<CrownVisualizer3DProps> = ({
                   opacity={line.coupling > 0.6 ? 0.75 : 0.3}
                   className={line.coupling > 0.6 ? "animate-pulse" : ""}
                 />
-                {/* Visual coordinate distance text */}
+                {/* Visual M-O distance text */}
                 {showMeasurements && (line.coupling > 0.3 || idx === 0) && (
                   <g transform={`translate(${(ox + cx) / 2}, ${(oy + cy) / 2 - 8})`}>
                     <rect 
@@ -776,7 +765,7 @@ export const CrownVisualizer3D: React.FC<CrownVisualizer3DProps> = ({
             );
           })}
 
-          {/* Hydrogen-Oxygen Hydrogen-Bond / Electrostatic Potential reference gradient for Lone Pair lobes definitions */}
+          {/* Electrostatic potential reference gradient for lone-pair lobes. */}
           <defs>
             <radialGradient id="lone-pair-glow" cx="30%" cy="50%" r="50%">
               <stop offset="0%" stopColor="#22d3ee" stopOpacity="0.8" />
@@ -791,7 +780,7 @@ export const CrownVisualizer3D: React.FC<CrownVisualizer3DProps> = ({
           <div className="text-slate-400 font-semibold uppercase tracking-wider mb-0.5">Charge Densities</div>
           <div className="flex items-center gap-1.5 text-rose-300">
             <span className="w-2.5 h-2.5 rounded-full bg-red-600 border border-red-500" />
-            <span>Oxygen Nuclei (δ⁻)</span>
+            <span>Oxygen donor atoms (δ−)</span>
           </div>
           <div className="flex items-center gap-1.5 text-cyan-300">
             <span className="w-2.5 h-2.5 rounded-full bg-cyan-500 border border-cyan-400 animate-pulse" />
@@ -799,7 +788,7 @@ export const CrownVisualizer3D: React.FC<CrownVisualizer3DProps> = ({
           </div>
           <div className="flex items-center gap-1.5 text-violet-400">
             <span className="w-2.5 h-2.5 rounded-full bg-violet-600 border border-violet-500" />
-            <span>Metal Cation (Aq⁺)</span>
+            <span>Metal cation (+)</span>
           </div>
         </div>
       </div>

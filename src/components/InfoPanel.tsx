@@ -4,9 +4,9 @@
  */
 
 import React from "react";
-import { BookOpen, Zap, Compass, Filter, Sparkles } from "lucide-react";
+import { BookOpen, Zap, Compass, Filter } from "lucide-react";
 import { Cation, CrownEther } from "../types";
-import { calculateEquilibriumState, getCrownGeometricalRadius } from "../chemicalData";
+import { BINDING_CONSTANTS, calculateEquilibriumState, getSizeFitStatus } from "../chemicalData";
 
 interface InfoPanelProps {
   selectedCrown: CrownEther;
@@ -18,10 +18,9 @@ export const InfoPanel: React.FC<InfoPanelProps> = ({
   selectedCation
 }) => {
   const eq = calculateEquilibriumState(selectedCrown.id, selectedCation.id);
-
-  // Check matched status
-  const idealSymbol = selectedCrown.idealCation;
-  const isMatch = idealSymbol.includes(selectedCation.symbol.slice(0, 2)) || (selectedCrown.id === "21c7" && (selectedCation.id === "rb" || selectedCation.id === "cs"));
+  const fit = getSizeFitStatus(selectedCrown.id, selectedCation.id);
+  const logK = BINDING_CONSTANTS[selectedCrown.id]?.[selectedCation.id] ?? 0;
+  const isMatch = fit.status === "match";
 
   return (
     <div className="flex flex-col bg-slate-900 rounded-2xl border border-slate-800 p-5 select-none h-full shadow-xl">
@@ -47,34 +46,34 @@ export const InfoPanel: React.FC<InfoPanelProps> = ({
           </div>
 
           <div className="space-y-2 leading-relaxed">
-            {isMatch ? (
+            {fit.status === "match" ? (
               <p>
-                <strong className="text-teal-400 font-bold">Resonant Fit!</strong> The cavity of{" "}
-                <span className="text-slate-100 font-semibold">{selectedCrown.name}</span> (radius{" "}
+                <strong className="text-teal-400 font-bold">Good size match.</strong>{" "}
+                <span className="text-slate-100 font-semibold">{selectedCation.symbol}</span> is in, or very close to, the cavity range of{" "}
+                <span className="text-slate-100 font-semibold">{selectedCrown.name}</span>{" "}
+                (
                 <span className="text-slate-100 font-semibold font-mono">
                   {selectedCrown.cavityRadiusMin.toFixed(2)}-{selectedCrown.cavityRadiusMax.toFixed(2)} Å
                 </span>
-                ) is perfectly matches the size of <span className="text-slate-100 font-semibold">{selectedCation.symbol}</span> (radius{" "}
-                <span className="text-slate-100 font-semibold font-mono">{selectedCation.radius.toFixed(2)} Å</span>).
-                The cation sits <span className="text-teal-400 font-bold">completely in-plane (Z ≈ 0 Å)</span>, maximizing
-                attraction to the lone pairs of all oxygens without steric strain.
+                ). The ion can sit near the centre so several oxygen lone pairs point at it at similar M-O distances. That gives a stronger
+                ion-dipole attraction and a higher stability constant{" "}
+                <span className="text-slate-100 font-semibold font-mono">(log K ≈ {logK.toFixed(2)})</span>.
               </p>
-            ) : selectedCation.radius + 1.24 < getCrownGeometricalRadius(selectedCrown.id) ? (
+            ) : fit.status === "too-small" ? (
               <p>
-                <strong className="text-amber-400 font-bold">Too Small!</strong> The cation{" "}
+                <strong className="text-amber-400 font-bold">Too small.</strong> The{" "}
                 <span className="text-slate-100 font-semibold">{selectedCation.symbol}</span> is too small for the cavity of{" "}
-                <span className="text-slate-100 font-semibold">{selectedCrown.name}</span>. It cannot bridge to all donor oxygens
-                simultaneously at close, ideal distances. In real coordinate chemistry, the crown ether ring undergoes{" "}
-                <span className="text-indigo-400">conformational puckering</span> (collapsing or folding inward) to coordinate the ion,
-                costing thermodynamic steric energy and resulting in a much weaker overall binding constant.
+                <span className="text-slate-100 font-semibold">{selectedCrown.name}</span>. From the centre, the oxygen donors are too far away, so the ion
+                cannot make strong contacts to all donor atoms at once. The crown may fold inward or the ion may bind off-centre, but the overall
+                complex is weaker.
               </p>
             ) : (
               <p>
-                <strong className="text-rose-400 font-bold">Too Large!</strong> The cation{" "}
-                <span className="text-slate-100 font-semibold">{selectedCation.symbol}</span> is physically too wide to slip into the cavity of{" "}
-                <span className="text-slate-100 font-semibold">{selectedCrown.name}</span>. It encounters severe van der Waals steric repulsion.
-                As a result, at rest, the cation <span className="text-rose-400 font-bold">sits high above the ether plane (Z ≈ {eq.zOffset.toFixed(2)} Å)</span> which reduces
-                the electrostatic coordination strength, or splits binding by forming a coordination sandwich between two flat crowns.
+                <strong className="text-rose-400 font-bold">Too large.</strong> The{" "}
+                <span className="text-slate-100 font-semibold">{selectedCation.symbol}</span> is too wide for the cavity of{" "}
+                <span className="text-slate-100 font-semibold">{selectedCrown.name}</span>. It cannot sit neatly inside the ring, so it sits above the oxygen plane
+                <span className="text-rose-400 font-bold"> (Z ≈ {eq.zOffset.toFixed(2)} Å)</span> or forces the crown to distort. Fewer M-O contacts are close to ideal,
+                so the binding is weaker.
               </p>
             )}
           </div>
@@ -95,11 +94,9 @@ export const InfoPanel: React.FC<InfoPanelProps> = ({
                 Desolvation Penalty
               </span>
               <p className="leading-relaxed text-slate-400 text-justify">
-                Cations are tightly enveloped by a water sheath in solution (hydration shell). Bonding with a crown ether requires
-                unwrapping those water dipoles. For highly dense ions like <span className="text-emerald-400">Li⁺</span>,
-                this cost (−515 kJ/mol) is massive. Larger ions like <span className="text-purple-400">K⁺</span> have lower charge densities,
-                making their hydration shells easier to strip—explaining why <span className="text-cyan-400">K⁺/18-Crown-6</span> is thermodynamically
-                highly favored over <span className="text-cyan-400">Li⁺/12-Crown-4</span> in absolute binding constant values.
+                In solution, cations are surrounded by solvent molecules. Before a crown ether can bind the ion, some of that solvation shell must be
+                disrupted. Small, high-charge-density ions such as <span className="text-emerald-400">Li⁺</span> are especially strongly hydrated, so this
+                cost can reduce the overall stability of the complex.
               </p>
             </div>
 
@@ -108,30 +105,31 @@ export const InfoPanel: React.FC<InfoPanelProps> = ({
                 Phase-Transfer Catalysis
               </span>
               <p className="leading-relaxed text-slate-400 text-justify">
-                Because of their lipophilic hydrocarbon exterior (the CH₂-CH₂ carbon backbone) and polar interior cavity,
-                crown ethers can dissolve inorganic salts (like KF or KMnO₄) inside non-polar solvents (like benzene or dichloromethane).
-                This pulls the bare, highly reactive anion (F⁻, MnO₄⁻) into the organic liquid phase where it can perform massive SN2 or redox reactions
-                that are otherwise completely impossible!
+                Crown ethers have a polar oxygen-lined cavity and a less polar hydrocarbon exterior. By wrapping around the metal cation, they can help
+                some ionic salts dissolve in organic solvents. This is why crown ethers are often described as phase-transfer agents.
               </p>
             </div>
           </div>
         </div>
 
-        {/* Real-world industrial applications list */}
+        {/* Exam revision checklist */}
         <div className="space-y-1.5 bg-slate-950/25 border border-slate-800/40 p-3 rounded-xl mt-1 select-none">
           <div className="flex items-center gap-1.5 text-cyan-400 text-[10px] font-mono uppercase font-bold mb-1">
             <Filter className="w-3.5 h-3.5" />
-            Industrial Applications:
+            Exam Answer Checklist:
           </div>
           <ul className="list-disc pl-4 space-y-1 text-slate-400 leading-normal">
             <li>
-              <span className="text-slate-200 font-semibold">Lithium Isotope Separation</span>: Enriched ⁶Li vs ⁷Li extraction for thermonuclear cooling rods.
+              <span className="text-slate-200 font-semibold">Structure</span>: crown ethers are cyclic polyethers with oxygen atoms pointing into the cavity.
             </li>
             <li>
-              <span className="text-slate-200 font-semibold">Nuclear Waste Remediation</span>: Utilizing custom crown polymers to pluck radioactive Cesium-137 out of high-level acidic aqueous streams.
+              <span className="text-slate-200 font-semibold">Bonding</span>: oxygen lone pairs attract the metal cation by ion-dipole/electrostatic interactions.
             </li>
             <li>
-              <span className="text-slate-200 font-semibold">Chemical Sensor Devices</span>: Crown-ether based ion-selective fields (ISFETs) that capture sodium/potassium ratios in diagnostic blood panels instantly.
+              <span className="text-slate-200 font-semibold">Selectivity</span>: the most stable complex forms when the ion radius matches the cavity size.
+            </li>
+            <li>
+              <span className="text-slate-200 font-semibold">Mismatch</span>: too small gives long, weak contacts; too large gives distortion or binding above the ring.
             </li>
           </ul>
         </div>

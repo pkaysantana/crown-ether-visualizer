@@ -6,16 +6,11 @@
 import React, { useState, useEffect } from "react";
 import { 
   Crown, 
-  Sparkles, 
   Eye, 
-  HelpCircle, 
-  Compass, 
   Sliders, 
   Zap, 
   Fingerprint, 
-  Info,
-  Layers,
-  ArrowRight
+  Layers
 } from "lucide-react";
 import { Cation, CrownEther } from "./types";
 import { CATIONS, CROWN_ETHERS, calculateEquilibriumState } from "./chemicalData";
@@ -59,10 +54,10 @@ export default function App() {
     return () => cancelAnimationFrame(frameId);
   }, [isOrbiting]);
 
-  // Adjust cation starting coordinates when either the crown ether or are changed
+  // Adjust cation starting coordinates when the crown ether changes.
   const handleSelectCrown = (crown: CrownEther) => {
     setSelectedCrown(crown);
-    // Automatically recalculate equilibrium positions for the new crown-cation pairing
+    // Automatically recalculate the equilibrium position for the new crown-cation pairing.
     const eq = calculateEquilibriumState(crown.id, selectedCation.id);
     setCatX(0);
     setCatY(0);
@@ -71,7 +66,7 @@ export default function App() {
 
   const handleSelectCation = (cation: Cation) => {
     setSelectedCation(cation);
-    // Automatically recalculate equilibrium positions for the new crown-cation pairing
+    // Automatically recalculate the equilibrium position for the new crown-cation pairing.
     const eq = calculateEquilibriumState(selectedCrown.id, cation.id);
     setCatX(0);
     setCatY(0);
@@ -140,14 +135,14 @@ export default function App() {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-lg font-bold tracking-tight text-slate-100">
-                Crown Ether Host-Guest Simulator
+                Crown Ether Size-Match Visualizer
               </h1>
               <span className="text-[9px] font-mono font-semibold px-2 py-0.5 rounded-full bg-cyan-950 text-cyan-400 border border-cyan-800/60 uppercase">
                 V1.2
               </span>
             </div>
             <p className="text-xs text-slate-400">
-              Interactive structural exploration of size-matching, steric strain, and ion selectivity
+              Exam revision model for oxygen lone-pair donation and cation selectivity
             </p>
           </div>
         </div>
@@ -162,7 +157,7 @@ export default function App() {
                 ? "bg-cyan-950/40 border-cyan-800 text-cyan-300" 
                 : "border-slate-800 text-slate-400 hover:text-slate-300"
             }`}
-            title="Display the oxygen atoms pointing inwards and their negative charged electron lobes (lone pairs)"
+            title="Display the oxygen atoms pointing inward and their lone-pair electron lobes"
           >
             <Eye className="w-3.5 h-3.5" />
             Lone Pairs Inward
@@ -176,7 +171,7 @@ export default function App() {
                 ? "bg-amber-950/40 border-amber-800 text-amber-300" 
                 : "border-slate-800 text-slate-400 hover:text-slate-300"
             }`}
-            title="Display live Ångström distance meters of the coordinate metal-oxygen bonds"
+            title="Display live Angstrom distance markers for metal-oxygen contacts"
           >
             {showMeasurements ? <Eye className="w-3.5 h-3.5" /> : <Layers className="w-3.5 h-3.5" />}
             Measurements (Å)
@@ -225,14 +220,14 @@ export default function App() {
             <div className="flex items-center gap-1.5 border-b border-slate-800 pb-2">
               <Sliders className="w-4 h-4 text-cyan-400" />
               <h3 className="text-xs font-mono tracking-wider text-slate-400 uppercase">
-                3D Alignments & Manual Displacement
+                View & Cation Position
               </h3>
             </div>
 
             {/* Tilt Slider */}
             <div>
               <div className="flex justify-between text-xs text-slate-400 mb-1">
-                <span>Yaw (Z-axis angle Rotation)</span>
+                <span>Yaw (ring rotation)</span>
                 <span className="font-mono text-slate-300">{Math.round(rotateAngle)}&deg;</span>
               </div>
               <input 
@@ -252,7 +247,7 @@ export default function App() {
             {/* Pitch Slider */}
             <div>
               <div className="flex justify-between text-xs text-slate-400 mb-1">
-                <span>Pitch (3D View Tilt Pitch)</span>
+                <span>Pitch (view tilt)</span>
                 <span className="font-mono text-slate-300">{Math.round(tiltAngle)}&deg;</span>
               </div>
               <input 
@@ -269,13 +264,13 @@ export default function App() {
             {/* Vertical coordinate slider (Cation zOffset elevation above/below loop) */}
             <div className="border-t border-slate-850 pt-2 bg-slate-950/40 p-2 rounded-lg border border-slate-800/40">
               <div className="flex justify-between text-xs mb-1">
-                <span className="text-slate-300 font-semibold">Cation Z-Elevation (Å)</span>
+                <span className="text-slate-300 font-semibold">Cation height above ring (Å)</span>
                 <span className={`font-mono font-bold ${Math.abs(catZ) < 0.2 ? "text-teal-400" : "text-indigo-400"}`}>
                   {catZ.toFixed(2)} Å
                 </span>
               </div>
               <p className="text-[10px] text-slate-500 leading-normal mb-2 leading-none">
-                Slide to push the positive cation up or down through the crown ring planar pore cavity.
+                Move the positive ion above or below the oxygen donor plane.
               </p>
               <input 
                 type="range"
@@ -289,7 +284,7 @@ export default function App() {
               />
               <div className="flex justify-between text-[8px] font-mono text-slate-500 mt-1 select-none">
                 <span>Below (-2.5 Å)</span>
-                <span className="text-teal-500/70">Planar center (0.0 Å)</span>
+                <span className="text-teal-500/70">Ring plane (0.0 Å)</span>
                 <span>Above (+2.5 Å)</span>
               </div>
             </div>
@@ -305,7 +300,7 @@ export default function App() {
             <div className="flex items-center gap-1">
               <Zap className="w-3.5 h-3.5 text-yellow-400" />
               <span className="text-[10px] font-mono tracking-wider font-semibold text-slate-400 uppercase">
-                Size-Matching Interactive Presets
+                Size-Matching Presets
               </span>
             </div>
             
@@ -316,7 +311,7 @@ export default function App() {
                 title="18-Crown-6 with Potassium (Perfect classic Size Match)"
                 id="preset-perfect-fit"
               >
-                 K⁺ &bull; 18-C-6 (Fit)
+                 K⁺ fits 18-C-6
               </button>
               <button
                 onClick={() => applyPreset("sodium-match")}
@@ -324,7 +319,7 @@ export default function App() {
                 title="15-Crown-5 with Sodium (Perfect smaller Size Match)"
                 id="preset-sodium-match"
               >
-                Na⁺ &bull; 15-C-5 (Fit)
+                Na⁺ fits 15-C-5
               </button>
               <button
                 onClick={() => applyPreset("too-small")}
@@ -332,7 +327,7 @@ export default function App() {
                 title="18-Crown-6 with Lithium (Lithium is too small, forces conformational ring folding)"
                 id="preset-too-small"
               >
-                Li⁺ &bull; 18-C-6 (Small)
+                Li⁺ too small
               </button>
               <button
                 onClick={() => applyPreset("cesium-high")}
@@ -340,7 +335,7 @@ export default function App() {
                 title="18-Crown-6 with Cesium (Cesium is too large, hovers high above the pore coordinate plane)"
                 id="preset-cesium-high"
               >
-                Cs⁺ &bull; 18-C-6 (Large)
+                Cs⁺ too large
               </button>
               <button
                 onClick={() => applyPreset("too-large")}
@@ -348,7 +343,7 @@ export default function App() {
                 title="12-Crown-4 with Potassium (Potassium is far too wide, sits extremely elevated on the ring)"
                 id="preset-too-large"
               >
-                K⁺ &bull; 12-C-4 (Huge)
+                K⁺ too large
               </button>
             </div>
           </div>
@@ -401,7 +396,7 @@ export default function App() {
       <footer className="mt-8 border-t border-slate-900 pt-5 text-center text-[10px] font-mono text-slate-500 select-none">
         <div className="max-w-[1400px] mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-3">
           <span>
-            Host-Guest Molecular Selector &bull; Physical coordinate simulation powered by static Lennard-Jones repulsions
+            Host-guest molecular selector &bull; Simplified teaching model for crown ether selectivity
           </span>
           <div className="flex items-center gap-1.5">
             <Fingerprint className="w-3.5 h-3.5 text-cyan-500" />
